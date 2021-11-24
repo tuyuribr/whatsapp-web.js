@@ -214,6 +214,7 @@ class Client extends EventEmitter {
          * @type {ClientInfo}
          */
         this.info = new ClientInfo(this, await page.evaluate(() => {
+            // return {};
             return window.Store.Conn.serialize();
         }));
 
