@@ -1,7 +1,9 @@
 'use strict';
 
 const EventEmitter = require('events');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker'); 
 const moduleRaid = require('@pedroslopez/moduleraid/moduleraid');
 
 const Util = require('./util/Util');
@@ -105,7 +107,10 @@ class Client extends EventEmitter {
             if(!browserArgs.find(arg => arg.includes('--user-agent'))) {
                 browserArgs.push(`--user-agent=${this.options.userAgent}`);
             }
-
+            puppeteer.use(StealthPlugin({
+                ...(Util.getMyRandomRenderer()),
+            }));
+            puppeteer.use(AdblockerPlugin({blockTrackers: true}));
             browser = await puppeteer.launch({...puppeteerOpts, args: browserArgs});
             page = (await browser.pages())[0];
         }
