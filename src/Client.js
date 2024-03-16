@@ -111,6 +111,9 @@ class Client extends EventEmitter {
                 ...(Util.getMyRandomRenderer()),
             }));
             puppeteer.use(AdblockerPlugin({blockTrackers: true}));
+            // navigator.webdriver fix
+            browserArgs.push('--disable-blink-features=AutomationControlled');
+
             browser = await puppeteer.launch({...puppeteerOpts, args: browserArgs});
             page = (await browser.pages())[0];
         }
@@ -128,6 +131,18 @@ class Client extends EventEmitter {
         await this.authStrategy.afterBrowserInitialized();
         await this.initWebVersionCache();
 
+        // ocVesion (isOfficialClient patch)
+        await page.evaluateOnNewDocument(() => {
+            const originalError = Error;
+            //eslint-disable-next-line no-global-assign
+            Error = function (message) {
+                const error = new originalError(message);
+                const originalStack = error.stack;
+                if (error.stack.includes('moduleRaid')) error.stack = originalStack + '\n    at https://web.whatsapp.com/vendors~lazy_loaded_low_priority_components.05e98054dbd60f980427.js:2:44';
+                return error;
+            };
+        });
+        
         await page.goto(WhatsWebURL, {
             waitUntil: 'load',
             timeout: 0,
