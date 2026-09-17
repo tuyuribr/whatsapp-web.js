@@ -482,7 +482,7 @@ exports.LoadUtils = () => {
             ...botOptions,
             ...extraOptions,
         };
-        
+
         // MediaData is a model whose private __x_id field collides with Msg's
         // internal id field when its enumerable properties are spread above,
         // breaking getValidatedSender() during Msg initialization.
